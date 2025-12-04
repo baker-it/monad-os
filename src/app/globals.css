@@ -29,6 +29,15 @@
   }
 }
 
+@keyframes border-beam {
+  0% {
+    transform: translateX(-200%) rotate(90deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(90deg);
+  }
+}
+
 @keyframes lightning-flash {
   0%, 90%, 100% { opacity: 0; }
   91%, 95% { opacity: 1; }

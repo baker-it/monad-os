@@ -7,14 +7,29 @@ export default function Home() {
       className="min-h-screen bg-black text-green-500 flex flex-col relative overflow-hidden"
       style={{ fontFamily: 'Space Mono, monospace' }}
     >
-      {/* Sacred Geometry Animated Background */}
-      <SacredBackground />
+      {/* Sacred Geometry Image Background */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/500kb-alchemic_hermes.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(2px) brightness(0.3)',
+          opacity: 0.7,
+        }}
+      />
+
+      {/* SVG Sacred Geometry Overlay */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <SacredBackground />
+      </div>
 
       {/* Gradient Overlay for readability */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.95) 100%)',
+          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.92) 100%)',
         }}
       />
 

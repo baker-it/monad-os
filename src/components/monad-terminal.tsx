@@ -7,6 +7,7 @@ import { Zap, Activity, CheckCircle } from "lucide-react"
 import { SacredLoader } from "./sacred-loader"
 import { RuneStatus } from "./rune-status"
 import { ArtifactCard } from "./artifact-card"
+import { BorderBeam } from "./ui/border-beam"
 
 export const MonadTerminal = () => {
   const [input, setInput] = useState("")
@@ -70,7 +71,14 @@ export const MonadTerminal = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-8rem)]" style={{ fontFamily: 'Space Mono, monospace' }}>
         {/* Left/Center: Input & Chat */}
-        <div className="lg:col-span-2 flex flex-col border-2 border-green-500/30 p-6 rounded-xl bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden animate-[border-glow_3s_ease-in-out_infinite]">
+        <div className="lg:col-span-2 flex flex-col border-2 border-green-500/30 p-6 rounded-xl bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+            <BorderBeam 
+              size={300} 
+              duration={8} 
+              colorFrom="#22c55e" 
+              colorTo="#0ea5e9" 
+              className="from-transparent via-green-500 to-transparent"
+            />
             {/* Background Grid Effect */}
             <div 
               className="absolute inset-0 opacity-5 pointer-events-none"
@@ -136,6 +144,15 @@ export const MonadTerminal = () => {
 
         {/* Right: ACP Stream */}
         <div className="border-2 border-green-500/30 p-6 rounded-xl bg-gradient-to-br from-black via-gray-900 to-black flex flex-col relative overflow-hidden">
+            <BorderBeam 
+              size={300} 
+              duration={10} 
+              delay={2}
+              colorFrom="#0ea5e9" 
+              colorTo="#22c55e" 
+              reverse
+              className="from-transparent via-cyan-500 to-transparent"
+            />
             {/* Header with Rune Status */}
             <div className="flex flex-col gap-3 border-b-2 border-green-500/30 pb-4 mb-4">
                 <div className="flex items-center gap-2">
@@ -176,9 +193,17 @@ export const MonadTerminal = () => {
             {statusData?.run?.status === 'awaiting_approval' && (
                 <button 
                     onClick={() => approve()}
-                    className="relative w-full py-4 bg-gradient-to-r from-green-600/20 to-cyan-600/20 hover:from-green-500/40 hover:to-cyan-500/40 text-green-100 rounded-lg border-2 border-green-500/50 hover:border-cyan-400 transition-all duration-300 font-bold tracking-widest sacred-border overflow-hidden group"
+                    className="relative w-full py-4 bg-gradient-to-r from-green-600/20 to-cyan-600/20 hover:from-green-500/40 hover:to-cyan-500/40 text-green-100 rounded-lg border-2 border-green-500/50 hover:border-cyan-400 transition-all duration-300 font-bold tracking-widest overflow-hidden group"
                     style={{ fontFamily: 'Orbitron, sans-serif' }}
                 >
+                    <BorderBeam 
+                      size={300} 
+                      duration={4} 
+                      colorFrom="#22c55e" 
+                      colorTo="#0ea5e9" 
+                      reverse
+                      className="from-transparent via-green-500 to-transparent"
+                    />
                     <span className="relative z-10 flex items-center justify-center gap-3">
                       <span className="text-2xl">◈</span>
                       [APPROVE ACTION]
