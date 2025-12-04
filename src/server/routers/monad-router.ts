@@ -29,7 +29,7 @@ export const monadRouter = j.router({
 
             // 1. MACRO INTERCEPTION
             if (prompt.startsWith("// PING 167")) {
-                return c.superjson({
+                return c.json({
                     type: "SYSTEM_MSG",
                     content: ">> RESONANCE CONFIRMED. CORE ALIGNED."
                 })
@@ -50,7 +50,7 @@ export const monadRouter = j.router({
                     isCanon: true
                 })
 
-                return c.superjson({
+                return c.json({
                     type: "SYSTEM_MSG",
                     content: ">> ARTIFACT CRYSTALLIZED. SAVED TO AKASHA."
                 })
@@ -73,11 +73,11 @@ export const monadRouter = j.router({
                     ]
                 })
 
-                return c.superjson({ type: "RESPONSE", content: text })
+                return c.json({ type: "RESPONSE", content: text })
 
             } catch (error) {
                 console.error("AI Generation Error:", error)
-                return c.superjson({ type: "ERROR", content: "Signal Lost. Check Neural Link (API Key)." })
+                return c.json({ type: "ERROR", content: "Signal Lost. Check Neural Link (API Key)." })
             }
         }),
 })
@@ -117,7 +117,7 @@ export const acpRouter = j.router({
                     })
                 })()
 
-            return c.superjson({ runId: run.id })
+            return c.json({ runId: run.id })
         }),
 
     status: publicProcedure
@@ -127,7 +127,7 @@ export const acpRouter = j.router({
             const run = await db.select().from(acpRuns).where(eq(acpRuns.id, input.id))
             const logs = await db.select().from(acpLogs).where(eq(acpLogs.runId, input.id))
 
-            return c.superjson({ run: run[0], logs })
+            return c.json({ run: run[0], logs })
         }),
 
     approve: publicProcedure
@@ -169,6 +169,6 @@ export const acpRouter = j.router({
                     await db.update(acpRuns).set({ status: "finished" }).where(eq(acpRuns.id, input.id))
                 })()
 
-            return c.superjson({ success: true })
+            return c.json({ success: true })
         })
 })
