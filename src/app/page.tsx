@@ -1,36 +1,30 @@
 import { MonadTerminal } from "@/components/monad-terminal"
+import { SacredBackground } from "@/components/sacred-background"
 
 export default function Home() {
   return (
     <main 
-      className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-black text-green-500 flex flex-col relative overflow-hidden"
+      className="min-h-screen bg-black text-green-500 flex flex-col relative overflow-hidden"
       style={{ fontFamily: 'Space Mono, monospace' }}
     >
-      {/* Cosmic Background Effect */}
+      {/* Sacred Geometry Animated Background */}
+      <SacredBackground />
+
+      {/* Gradient Overlay for readability */}
       <div 
-        className="absolute inset-0 opacity-10 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.3) 0%, transparent 50%)',
+          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.95) 100%)',
         }}
       />
-      
-      {/* Animated Stars */}
-      <div className="absolute inset-0 pointer-events-none opacity-30">
-        {[...Array(50)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-green-400"
-            style={{
-              width: Math.random() * 3 + 'px',
-              height: Math.random() * 3 + 'px',
-              top: Math.random() * 100 + '%',
-              left: Math.random() * 100 + '%',
-              animation: `pulse-glow ${Math.random() * 3 + 2}s ease-in-out infinite`,
-              animationDelay: Math.random() * 2 + 's'
-            }}
-          />
-        ))}
-      </div>
+
+      {/* Vignette Effect */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          boxShadow: 'inset 0 0 300px rgba(0,0,0,0.9), inset 0 0 100px rgba(0,0,0,0.8)',
+        }}
+      />
 
       {/* Header */}
       <header className="relative z-10 p-6 border-b-2 border-green-500/30 bg-black/50 backdrop-blur-md">
