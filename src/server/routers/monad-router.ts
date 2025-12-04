@@ -101,21 +101,27 @@ export const acpRouter = j.router({
                 message: "Agent initialized. Parsing intent..."
             })
 
-                // SIMULATE AGENT LOOP (Async)
-                // We don't await this promise to allow immediate return to client
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                ; (async () => {
-                    // Wait 2s
-                    await new Promise(r => setTimeout(r, 2000))
+            // SIMULATE AGENT LOOP (Async)
+            const simulation = (async () => {
+                // Wait 2s
+                await new Promise(r => setTimeout(r, 2000))
 
-                    // Update to awaiting approval
-                    await db.update(acpRuns).set({ status: "awaiting_approval" }).where(eq(acpRuns.id, run.id))
-                    await db.insert(acpLogs).values({
-                        runId: run.id,
-                        type: "ACTION",
-                        message: "Plan generated. Awaiting Source approval."
-                    })
-                })()
+                // Update to awaiting approval
+                await db.update(acpRuns).set({ status: "awaiting_approval" }).where(eq(acpRuns.id, run.id))
+                await db.insert(acpLogs).values({
+                    runId: run.id,
+                    type: "ACTION",
+                    message: "Plan generated. Awaiting Source approval."
+                })
+            })()
+
+            if (c.executionCtx?.waitUntil) {
+                c.executionCtx.waitUntil(simulation)
+            } else {
+                // Fallback for environments without waitUntil (e.g. local dev)
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                simulation
+            }
 
             return c.json({ runId: run.id })
         }),
@@ -144,30 +150,35 @@ export const acpRouter = j.router({
                 message: "User approved. Executing..."
             })
 
-                // SIMULATE EXECUTION
-                // We don't await this promise to allow immediate return to client
+            // SIMULATE EXECUTION
+            const execution = (async () => {
+                await new Promise(r => setTimeout(r, 2000))
+                await db.insert(acpLogs).values({
+                    runId: input.id,
+                    type: "INFO",
+                    message: "Executing Step 1: Crystallizing Insight..."
+                })
+                await new Promise(r => setTimeout(r, 1000))
+                await db.insert(crystallizedShards).values({
+                    sessionId: null, // Optional
+                    type: "STRATEGY",
+                    payload: { strategy: "Fractal Recursion" },
+                    isCanon: true
+                })
+                await db.insert(acpLogs).values({
+                    runId: input.id,
+                    type: "INFO",
+                    message: "Artifact saved."
+                })
+                await db.update(acpRuns).set({ status: "finished" }).where(eq(acpRuns.id, input.id))
+            })()
+
+            if (c.executionCtx?.waitUntil) {
+                c.executionCtx.waitUntil(execution)
+            } else {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                ; (async () => {
-                    await new Promise(r => setTimeout(r, 2000))
-                    await db.insert(acpLogs).values({
-                        runId: input.id,
-                        type: "INFO",
-                        message: "Executing Step 1: Crystallizing Insight..."
-                    })
-                    await new Promise(r => setTimeout(r, 1000))
-                    await db.insert(crystallizedShards).values({
-                        sessionId: null, // Optional
-                        type: "STRATEGY",
-                        payload: { strategy: "Fractal Recursion" },
-                        isCanon: true
-                    })
-                    await db.insert(acpLogs).values({
-                        runId: input.id,
-                        type: "INFO",
-                        message: "Artifact saved."
-                    })
-                    await db.update(acpRuns).set({ status: "finished" }).where(eq(acpRuns.id, input.id))
-                })()
+                execution
+            }
 
             return c.json({ success: true })
         })
