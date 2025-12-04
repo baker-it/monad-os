@@ -3,7 +3,10 @@
 import { useState } from "react"
 import { client } from "@/lib/client"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { Cpu } from "lucide-react"
+import { Zap, Activity, CheckCircle } from "lucide-react"
+import { SacredLoader } from "./sacred-loader"
+import { RuneStatus } from "./rune-status"
+import { ArtifactCard } from "./artifact-card"
 
 export const MonadTerminal = () => {
   const [input, setInput] = useState("")
@@ -61,60 +64,127 @@ export const MonadTerminal = () => {
     }
   })
 
+  const isProcessing = statusData?.run?.status === 'starting' || statusData?.run?.status === 'working'
+  const isFinished = statusData?.run?.status === 'finished'
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-8rem)] bg-black text-green-500 font-mono">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-8rem)]" style={{ fontFamily: 'Space Mono, monospace' }}>
         {/* Left/Center: Input & Chat */}
-        <div className="md:col-span-2 flex flex-col border border-green-900 p-4 rounded bg-black/90">
-            <div className="flex-1 overflow-y-auto mb-4 space-y-2">
-                <div className="text-green-700">{">>"} SYSTEM READY. WAITING FOR WILL...</div>
+        <div className="lg:col-span-2 flex flex-col border-2 border-green-500/30 p-6 rounded-xl bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden animate-[border-glow_3s_ease-in-out_infinite]">
+            {/* Background Grid Effect */}
+            <div 
+              className="absolute inset-0 opacity-5 pointer-events-none"
+              style={{
+                backgroundImage: 'linear-gradient(0deg, transparent 24%, rgba(34, 197, 94, .2) 25%, rgba(34, 197, 94, .2) 26%, transparent 27%, transparent 74%, rgba(34, 197, 94, .2) 75%, rgba(34, 197, 94, .2) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(34, 197, 94, .2) 25%, rgba(34, 197, 94, .2) 26%, transparent 27%, transparent 74%, rgba(34, 197, 94, .2) 75%, rgba(34, 197, 94, .2) 76%, transparent 77%, transparent)',
+                backgroundSize: '50px 50px'
+              }}
+            />
+            
+            <div className="flex-1 overflow-y-auto mb-6 space-y-4 relative z-10">
+                <div className="flex items-center gap-3 text-green-400/70 sacred-glow">
+                  <Zap size={20} className="animate-pulse" />
+                  <span className="text-sm tracking-wider">{">>"} SYSTEM READY. WAITING FOR WILL...</span>
+                </div>
+                
                 {statusData?.run?.intent && (
-                    <div className="text-green-600">
-                        {`> Intent Injected: "${statusData.run.intent}"`}
+                    <div className="bg-green-500/5 border border-green-500/30 rounded-lg p-4 space-y-2">
+                        <div className="flex items-center gap-2 text-cyan-400">
+                          <Activity size={16} />
+                          <span className="text-xs tracking-widest opacity-70">INTENT CAPTURED</span>
+                        </div>
+                        <div className="text-green-300 pl-6 font-bold">
+                            {`"${statusData.run.intent}"`}
+                        </div>
                     </div>
+                )}
+
+                {isProcessing && (
+                  <div className="flex items-center gap-4 text-yellow-400 animate-pulse">
+                    <SacredLoader size={30} />
+                    <span className="text-sm sacred-glow">Processing Intent...</span>
+                  </div>
+                )}
+
+                {isFinished && (
+                  <div className="flex items-center gap-3 text-green-400 animate-[float-up_1s_ease-out]">
+                    <CheckCircle size={20} />
+                    <span className="text-sm sacred-glow">Sequence Complete</span>
+                  </div>
                 )}
             </div>
             
-            <form onSubmit={(e) => {
+            <form 
+              onSubmit={(e) => {
                 e.preventDefault()
                 if (!input.trim()) return
                 injectWill(input)
                 setInput("")
-            }} className="flex gap-2 items-center">
-                <span className="animate-pulse text-green-400">{">"}</span>
+              }} 
+              className="flex gap-3 items-center relative z-10 p-4 bg-black/50 border border-green-500/30 rounded-lg backdrop-blur-sm"
+            >
+                <span className="text-2xl text-cyan-400 animate-pulse sacred-glow">{"▶"}</span>
                 <input 
-                    className="flex-1 bg-transparent border-b border-green-800 focus:outline-none text-green-400 p-2"
+                    className="flex-1 bg-transparent border-b-2 border-green-500/50 focus:border-cyan-400 focus:outline-none text-green-300 py-2 px-2 placeholder-green-700/50 transition-all duration-300 sacred-glow"
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     autoFocus
                     placeholder="Inject Will..."
+                    style={{ fontSize: '1rem' }}
                 />
             </form>
         </div>
 
         {/* Right: ACP Stream */}
-        <div className="border border-green-900 p-4 rounded bg-black/90 flex flex-col">
-            <div className="flex items-center gap-2 border-b border-green-900 pb-2 mb-2">
-                <Cpu size={16} />
-                <span>ACP STREAM</span>
-                {statusData?.run?.status && <span className="ml-auto text-xs px-2 py-0.5 bg-green-900 rounded">{statusData.run.status}</span>}
+        <div className="border-2 border-green-500/30 p-6 rounded-xl bg-gradient-to-br from-black via-gray-900 to-black flex flex-col relative overflow-hidden">
+            {/* Header with Rune Status */}
+            <div className="flex flex-col gap-3 border-b-2 border-green-500/30 pb-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <Zap size={20} className="text-cyan-400 animate-pulse" />
+                  <span className="font-bold tracking-widest text-sm" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+                    ACP STREAM
+                  </span>
+                </div>
+                {statusData?.run?.status && (
+                  <RuneStatus status={statusData.run.status} />
+                )}
             </div>
             
-            <div className="flex-1 overflow-y-auto text-xs space-y-1 font-mono">
+            {/* Logs */}
+            <div className="flex-1 overflow-y-auto text-xs space-y-2 mb-4">
                 {statusData?.logs?.map((log: any, i: number) => (
-                    <div key={i} className="flex gap-2">
-                        <span className="text-green-700">[{new Date(log.timestamp).toLocaleTimeString()}]</span>
-                        <span className={log.type === 'ERROR' ? 'text-red-500' : 'text-green-400'}>{log.message}</span>
+                    <div 
+                      key={i} 
+                      className="flex flex-col gap-1 p-2 bg-green-500/5 border-l-2 border-green-500/50 rounded"
+                    >
+                        <span className="text-green-700/70 text-[10px] tracking-wider">
+                          [{new Date(log.timestamp).toLocaleTimeString()}]
+                        </span>
+                        <span className={`${log.type === 'ERROR' ? 'text-red-400' : log.type === 'ACTION' ? 'text-cyan-400' : 'text-green-300'} leading-relaxed`}>
+                          {log.message}
+                        </span>
                     </div>
                 ))}
-                {!statusData && <div className="text-green-900 italic">Standby...</div>}
+                {!statusData && (
+                  <div className="flex flex-col items-center justify-center h-full gap-4 opacity-30">
+                    <SacredLoader size={50} className="text-green-700" />
+                    <div className="text-green-700 italic text-center">Standby...</div>
+                  </div>
+                )}
             </div>
 
+            {/* Approve Button */}
             {statusData?.run?.status === 'awaiting_approval' && (
                 <button 
                     onClick={() => approve()}
-                    className="mt-4 w-full py-2 bg-green-900 hover:bg-green-800 text-green-100 rounded border border-green-700 transition-colors"
+                    className="relative w-full py-4 bg-gradient-to-r from-green-600/20 to-cyan-600/20 hover:from-green-500/40 hover:to-cyan-500/40 text-green-100 rounded-lg border-2 border-green-500/50 hover:border-cyan-400 transition-all duration-300 font-bold tracking-widest sacred-border overflow-hidden group"
+                    style={{ fontFamily: 'Orbitron, sans-serif' }}
                 >
-                    [APPROVE ACTION]
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      <span className="text-2xl">◈</span>
+                      [APPROVE ACTION]
+                      <span className="text-2xl">◈</span>
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 </button>
             )}
         </div>
