@@ -107,7 +107,7 @@ export const acpRouter = j.router({
             const host = c.req.header('host') || 'localhost:3000'
             const baseUrl = `${protocol}://${host}`
             
-            fetch(`${baseUrl}/api/acp/process-background`, {
+            fetch(`${baseUrl}/api/acp/processBackground`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ runId: run.id })
@@ -165,7 +165,7 @@ export const acpRouter = j.router({
             const host = c.req.header('host') || 'localhost:3000'
             const baseUrl = `${protocol}://${host}`
             
-            fetch(`${baseUrl}/api/acp/execute-background`, {
+            fetch(`${baseUrl}/api/acp/executeBackground`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ runId: input.id })
