@@ -6,11 +6,15 @@ export const client = createClient<AppRouter>({
 })
 
 function getBaseUrl() {
-  // In production (Vercel), point to the Cloudflare Worker
-  if (process.env.NODE_ENV === "production") {
-    return "https://jstack-app.skrytyjumper.workers.dev/api"
+  // In browser (client-side), use relative URL to hit Vercel's own API routes
+  if (typeof window !== 'undefined') {
+    return "/api"
   }
 
-  // Locally, use localhost
+  // Server-side (SSR/SSG), use localhost in dev or relative in production
+  if (process.env.NODE_ENV === "production") {
+    return "/api"
+  }
+
   return "http://localhost:3000/api"
 }
