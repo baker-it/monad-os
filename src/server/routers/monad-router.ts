@@ -101,19 +101,36 @@ export const acpRouter = j.router({
                 message: "Agent initialized. Parsing intent..."
             })
 
-            // SIMULATE AGENT LOOP (Synchronous for Vercel compatibility)
+            // Trigger background processing via fetch (webhook pattern for Vercel)
+            // This allows us to return response immediately while processing continues
+            const baseUrl = c.req.url.split('/api/')[0]
+            fetch(`${baseUrl}/api/acp/process-background`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ runId: run.id })
+            }).catch(err => console.error('Background process error:', err))
+
+            return c.json({ runId: run.id })
+        }),
+
+    // Background processor (called via webhook)
+    processBackground: publicProcedure
+        .input(z.object({ runId: z.string() }))
+        .mutation(async ({ ctx, input, c }) => {
+            const { db } = ctx
+            
             // Wait 2s
             await new Promise(r => setTimeout(r, 2000))
 
             // Update to awaiting approval
-            await db.update(acpRuns).set({ status: "awaiting_approval" }).where(eq(acpRuns.id, run.id))
+            await db.update(acpRuns).set({ status: "awaiting_approval" }).where(eq(acpRuns.id, input.runId))
             await db.insert(acpLogs).values({
-                runId: run.id,
+                runId: input.runId,
                 type: "ACTION",
                 message: "Plan generated. Awaiting Source approval."
             })
 
-            return c.json({ runId: run.id })
+            return c.json({ success: true })
         }),
 
     status: publicProcedure
@@ -140,26 +157,42 @@ export const acpRouter = j.router({
                 message: "User approved. Executing..."
             })
 
-            // SIMULATE EXECUTION (Synchronous for Vercel compatibility)
+            // Trigger background execution via fetch
+            const baseUrl = c.req.url.split('/api/')[0]
+            fetch(`${baseUrl}/api/acp/execute-background`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ runId: input.id })
+            }).catch(err => console.error('Background execution error:', err))
+
+            return c.json({ success: true })
+        }),
+
+    // Background executor (called via webhook)
+    executeBackground: publicProcedure
+        .input(z.object({ runId: z.string() }))
+        .mutation(async ({ ctx, input, c }) => {
+            const { db } = ctx
+
             await new Promise(r => setTimeout(r, 2000))
             await db.insert(acpLogs).values({
-                runId: input.id,
+                runId: input.runId,
                 type: "INFO",
                 message: "Executing Step 1: Crystallizing Insight..."
             })
             await new Promise(r => setTimeout(r, 1000))
             await db.insert(crystallizedShards).values({
-                sessionId: null, // Optional
+                sessionId: null,
                 type: "STRATEGY",
                 payload: { strategy: "Fractal Recursion" },
                 isCanon: true
             })
             await db.insert(acpLogs).values({
-                runId: input.id,
+                runId: input.runId,
                 type: "INFO",
                 message: "Artifact saved."
             })
-            await db.update(acpRuns).set({ status: "finished" }).where(eq(acpRuns.id, input.id))
+            await db.update(acpRuns).set({ status: "finished" }).where(eq(acpRuns.id, input.runId))
 
             return c.json({ success: true })
         })
