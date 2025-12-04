@@ -115,10 +115,16 @@ export const acpRouter = j.router({
                 })
             })()
 
-            if (c.executionCtx?.waitUntil) {
-                c.executionCtx.waitUntil(simulation)
-            } else {
-                // Fallback for environments without waitUntil (e.g. local dev)
+            try {
+                if (c.executionCtx?.waitUntil) {
+                    c.executionCtx.waitUntil(simulation)
+                } else {
+                    // Fallback for environments without waitUntil (e.g. local dev)
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                    simulation
+                }
+            } catch {
+                // Next.js/local dev - fire and forget
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 simulation
             }
@@ -173,9 +179,15 @@ export const acpRouter = j.router({
                 await db.update(acpRuns).set({ status: "finished" }).where(eq(acpRuns.id, input.id))
             })()
 
-            if (c.executionCtx?.waitUntil) {
-                c.executionCtx.waitUntil(execution)
-            } else {
+            try {
+                if (c.executionCtx?.waitUntil) {
+                    c.executionCtx.waitUntil(execution)
+                } else {
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                    execution
+                }
+            } catch {
+                // Next.js/local dev - fire and forget
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 execution
             }
