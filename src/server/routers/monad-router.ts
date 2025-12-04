@@ -103,7 +103,10 @@ export const acpRouter = j.router({
 
             // Trigger background processing via fetch (webhook pattern for Vercel)
             // This allows us to return response immediately while processing continues
-            const baseUrl = c.req.url.split('/api/')[0]
+            const protocol = c.req.header('x-forwarded-proto') || 'http'
+            const host = c.req.header('host') || 'localhost:3000'
+            const baseUrl = `${protocol}://${host}`
+            
             fetch(`${baseUrl}/api/acp/process-background`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -158,7 +161,10 @@ export const acpRouter = j.router({
             })
 
             // Trigger background execution via fetch
-            const baseUrl = c.req.url.split('/api/')[0]
+            const protocol = c.req.header('x-forwarded-proto') || 'http'
+            const host = c.req.header('host') || 'localhost:3000'
+            const baseUrl = `${protocol}://${host}`
+            
             fetch(`${baseUrl}/api/acp/execute-background`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
